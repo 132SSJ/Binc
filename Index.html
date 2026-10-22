@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bin 만들기</title>
+<style>body{font-family:sans-serif;padding:20px;max-width:500px;margin:0 auto}
+input{width:100%;padding:10px;font-size:16px;box-sizing:border-box;margin:8px 0}
+button{padding:12px 20px;font-size:16px}
+#out{margin-top:16px;padding:12px;background:#f0f0f0;border-radius:8px;word-break:break-all;white-space:pre-wrap}
+</style></head>
+<body>
+<h3>jsonbin Bin 생성 도구</h3>
+<p>1) jsonbin.io 로그인 → API Keys 메뉴 → X-Master-Key 복사해서 아래에 붙여넣기</p>
+<input id="key" placeholder="X-Master-Key 붙여넣기">
+<button onclick="go()">새 Bin 만들기</button>
+<div id="out"></div>
+<script>
+async function go(){
+  const key=document.getElementById("key").value.trim();
+  const out=document.getElementById("out");
+  if(!key){out.textContent="키를 먼저 붙여넣어줘";return}
+  out.textContent="만드는 중...";
+  try{
+    const r=await fetch("https://api.jsonbin.io/v3/b",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","X-Master-Key":key},
+      body:JSON.stringify({})
+    });
+    const j=await r.json();
+    if(j.metadata&&j.metadata.id){
+      out.textContent="✅ 생성됨!\n\nBin ID: "+j.metadata.id+"\n\n이 ID랑 아까 키를 체크리스트 코드에 넣으면 돼.";
+    }else{
+      out.textContent="실패: "+JSON.stringify(j);
+    }
+  }catch(e){out.textContent="에러: "+e.message}
+}
+</script>
+</body>
+</html>
